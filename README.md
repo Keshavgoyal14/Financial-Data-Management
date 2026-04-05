@@ -132,6 +132,70 @@ Deployed docs URLs:
 - `403 Insufficient permissions`: token user role cannot access endpoint
 - `500 NOT NULL constraint failed: users.password`: `/api/users` requires password in create body
 
+## Evaluation Criteria Mapping
+
+### 1. Backend Design
+
+- Clear modular structure under `backend/src`:
+	- `routes/` for API handlers
+	- `middleware/` for auth, validation, and error handling
+	- `services/` for JWT and password utilities
+	- `db.ts` for schema initialization and persistence setup
+- Routes are grouped by domain: auth, users, records, dashboard.
+
+### 2. Logical Thinking
+
+- Business rules are enforced through role middleware:
+	- viewer: dashboard summary
+	- analyst: dashboard + records read
+	- admin: user management + records write
+- Inactive users are blocked at authentication middleware level.
+
+### 3. Functionality
+
+- Authentication: register and login with JWT.
+- User lifecycle: list, create, update, delete.
+- Records lifecycle: list with filters + create/update/delete.
+- Dashboard analytics: totals, category splits, trends, recent activity.
+- Interactive API docs available through Swagger.
+
+### 4. Code Quality
+
+- TypeScript with strict typing and consistent naming.
+- Reusable helper functions reduce route-level duplication.
+- Validation is centralized and route handlers remain focused on business logic.
+
+### 5. Database and Data Modeling
+
+- SQLite schema includes:
+	- `users` with role and status constraints
+	- `financial_records` with amount/type checks and foreign key to users
+- Indexes on record date/type/category support query performance.
+
+### 6. Validation and Reliability
+
+- Zod input validation for request bodies and query parameters.
+- Consistent HTTP status handling for auth failures, permission failures, validation errors, and not-found cases.
+- Global error middleware normalizes runtime and validation errors.
+
+### 7. Documentation
+
+- Root README: architecture, setup, environment, run/build steps, deployment, troubleshooting.
+- Backend README: endpoint behavior, role model, seeding details, and API docs URLs.
+- OpenAPI/Swagger docs provide executable API documentation.
+
+### 8. Additional Thoughtfulness
+
+- Deployment-ready Swagger and OpenAPI endpoints.
+- Environment-driven seeding strategy for flexible test data setup.
+- Render deployment guidance included for quick hosting and verification.
+
+## Assumptions and Tradeoffs
+
+- SQLite is used for simplicity and portability; for larger scale workloads, migration to a managed relational database is recommended.
+- JWT tokens are stateless and simple for deployment; token revocation strategy can be added later if required.
+- Current architecture prioritizes clarity and assignment fit over advanced patterns like repository abstraction layers.
+
 ## Detailed Docs
 
 - Backend details: [backend/README.md](backend/README.md)
